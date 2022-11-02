@@ -1,29 +1,19 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
+	"rest-api-golang/controllers"
+	"rest-api-golang/models"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	http.HandleFunc("/", handlerIndex)
-	http.HandleFunc("/index", handlerIndex)
-	http.HandleFunc("/hello", handlerHello)
+	r := gin.Default()
 
-	alamat := "localhost:8080"
-	fmt.Printf("Server berjalan pada port %s\n", alamat)
-	err := http.ListenAndServe(alamat, nil)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-}
+	models.ConnectDatabase()
 
-func handlerIndex(w http.ResponseWriter, r *http.Request) {
-	pesan := "Welcome"
-	w.Write([]byte(pesan))
-}
+	r.GET("/books", controllers.CariBuku)
+	r.POST("/books", controllers.TambahBuku)
 
-func handlerHello(w http.ResponseWriter, r *http.Request) {
-	pesan := "Hello World!"
-	w.Write([]byte(pesan))
+	r.Run()
 }
