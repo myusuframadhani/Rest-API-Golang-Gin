@@ -5,5 +5,4 @@ type Buku struct {
 	Judul    string `json:"judul"`
 	Penulis  string `json:"penulis"`
 	Penerbit string `json:"penerbit"`
-	Harga    uint64 `json:"harga"`
 }

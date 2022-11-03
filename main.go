@@ -12,8 +12,20 @@ func main() {
 
 	models.ConnectDatabase()
 
+	// Find all books
 	r.GET("/books", controllers.CariBuku)
+
+	// Add some book
 	r.POST("/books", controllers.TambahBuku)
+
+	// Find book by ID
+	r.GET("/books/:id", controllers.CariBukuSatuan)
+
+	// Update book
+	r.PATCH("/books/:id", controllers.UpdateBuku)
+
+	// Delete a book
+	r.DELETE("/books/:id", controllers.HapusBuku)
 
 	r.Run()
 }

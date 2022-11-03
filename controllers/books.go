@@ -14,22 +14,60 @@ func CariBuku(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": books})
 }
 
-type InputTambahBuku struct {
-	Judul    string `json:"judul" binding:"required"`
-	Penulis  string `json:"penulis" binding:"required"`
-	Penerbit string `json:"penerbit" binding:"required"`
-	Harga    uint64 `json:"harga" binding:"required"`
-}
-
 func TambahBuku(c *gin.Context) {
-	var input InputTambahBuku
+	input := InputTambahBuku{}
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	book := models.Buku{Judul: input.Judul, Penulis: input.Penulis, Penerbit: input.Penerbit, Harga: input.Harga}
+	book := models.Buku{Judul: input.Judul, Penulis: input.Penulis, Penerbit: input.Penerbit}
 	models.DB.Create(&book)
 
 	c.JSON(http.StatusOK, gin.H{"data": book})
+}
+
+func CariBukuSatuan(c *gin.Context) {
+	var book models.Buku
+
+	if err := models.DB.Where("id = ?", c.Param("id")).First(&book).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Buku tidak ditemukan!"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": book})
+}
+
+func UpdateBuku(c *gin.Context) {
+	// Get model if exist
+	var book models.Buku
+	if err := models.DB.Where("id = ?", c.Param("id")).First(&book).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Data tidak ditemukan!"})
+		return
+	}
+
+	// Validate input
+	var input InputUpdateBuku
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	models.DB.Model(&book).Updates(input)
+
+	c.JSON(http.StatusOK, gin.H{"data": book})
+}
+
+func HapusBuku(c *gin.Context) {
+
+	var book models.Buku
+
+	if err := models.DB.Where("id = ?", c.Param("id")).First(&book).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Data tidak ditemukan!"})
+		return
+	}
+
+	models.DB.Delete(&book)
+
+	c.JSON(http.StatusOK, gin.H{"data": true})
 }
